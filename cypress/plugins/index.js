@@ -31,6 +31,7 @@ module.exports = (on, config) => {
   // `on` is used to hook into various events Cypress emits
   // `config` is the resolved Cypress config
   config.env.examples = getExamples();
+  config.env.apiPages = getApiDocumentationPages();
   return config;
 }
 
@@ -80,6 +81,23 @@ function getExamples() {
         }
       })
       pageGroups.push({ page: page, examples: pageExamples });
+    }
+  })
+  return pageGroups;
+}
+
+function getApiDocumentationPages() {
+  const basePath = '../ag-grid/grid-packages/ag-grid-docs/documentation/doc-pages/'
+  var files = fs.readdirSync(basePath);
+  var pageGroups = [];
+
+  files.forEach(page => {
+    const indexFilePath = basePath + page + '/index.md';
+    if (fs.existsSync(indexFilePath)) {
+      const indexFile = fs.readFileSync(indexFilePath);
+      if (indexFile.includes('<api-documentation')) {
+        pageGroups.push({ page: page });
+      }
     }
   })
   return pageGroups;
